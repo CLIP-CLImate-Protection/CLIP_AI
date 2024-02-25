@@ -12,14 +12,14 @@ class DetectionResult(BaseModel):
     detected_objects: List[str]
     filename: str
 
-#uvicorn predict:app --reload
+# uvicorn predict:app --reload
 @app.post("/detect")
 async def detect(image: UploadFile = File(...)):
     img = await image.read()
     with open(image.filename, "wb") as f:
         f.write(img)
 
-    model = YOLO("../best (2).pt")  # build a new model from scratch
+    model = YOLO("best.pt")  # build a new model from scratch
     results = model.predict(source=image.filename)
     names = model.names
 
@@ -31,3 +31,10 @@ async def detect(image: UploadFile = File(...)):
 
     return {"detected_objects": detected_objects, "filename": image.filename}
 
+@app.get("/")
+def read_root():
+    return {"Hello": "World!"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
